@@ -6,6 +6,7 @@
 
 - 项目地址:https://1024code.com/codecubes/ystkokb
 - Github 地址：https://github.com/2230307855/Go_to_success_douyin
+- docker-compose文件：[文件](./douyin.yaml)
 
 # 二、项目分工
 

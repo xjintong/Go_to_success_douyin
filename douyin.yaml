@@ -1,0 +1,50 @@
+version: '3'
+services:
+  go-app:
+    image: xjintong/bytedance:0.4
+    container_name: bytedance_go
+    restart: unless-stopped
+    working_dir: /go/src
+    ports:
+      - "8080:8080"
+    tty: true
+    environment:
+      MYSQL_HOST: "mysql"       # 连接下面的mysql容器
+      MYSQL_DATABASE: "bytedance"
+      MYSQL_USER: "bytedance"
+      MYSQL_PASSWORD: "bytedance"
+      INIO_ENDPOINT: minio:9000  # 设置 Go 项目中连接 MinIO 的端点地址
+    depends_on:
+      - mysql
+      - minio
+    entrypoint: ["sh", "/go/src/start.sh"]  # 使用等待脚本作为 entrypoint
+    
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    container_name: bytedance_mysql
+    environment:
+      MYSQL_DATABASE: "bytedance"
+      MYSQL_USER: "bytedance"
+      MYSQL_PASSWORD: "bytedance"
+      MYSQL_ROOT_PASSWORD: "bytedance"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+
+
+  minio:
+    image: quay.io/minio/minio
+    container_name: bytedance_minio
+    restart: unless-stopped
+    volumes:
+      - ./minio/data:/data
+      - ./minio/config:/root/.minio
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    environment:
+      MINIO_ROOT_USER: miniotest
+      MINIO_ROOT_PASSWORD: miniotest
+    command: server /data --console-address ":9090"
